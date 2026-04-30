@@ -986,7 +986,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     reset_session(user_id)
 
-    kb = [["Оренда", "Купівля-продаж"]]
+    kb = [["Оренда", "Купівля-продаж"], ["Брокер"]]
     await update.message.reply_text(
         "Оберіть тип договору:",
         reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True)
