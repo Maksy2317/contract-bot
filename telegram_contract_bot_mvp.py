@@ -1064,7 +1064,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     s = sessions[user_id]
     text = update.message.text.strip()
 
-        if s["state"] == STATE_WAIT_TYPE:
+            if s["state"] == STATE_WAIT_TYPE:
         if text == "Оренда":
             s["contract_type"] = "rent"
             s["state"] = STATE_OWNER_MODE
