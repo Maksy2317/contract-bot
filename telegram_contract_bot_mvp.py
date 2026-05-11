@@ -418,22 +418,27 @@ def merge_results(results: list[dict], fields: list[str]):
 # =========================================================
 def progress_text(session: dict):
     current = session["state"]
+    contract_type = session.get("contract_type")
 
     if current in [STATE_OWNER_MODE, STATE_OWNER_PHOTOS, STATE_OWNER_MANUAL, STATE_OWNER_REVIEW]:
-        step = "1/5 — Наймодавець"
+        step = "1/5 — Наймодавець" if contract_type == "rent" else "1/4 — Продавець"
+
     elif current in [STATE_TENANT_MODE, STATE_TENANT_PHOTOS, STATE_TENANT_MANUAL, STATE_TENANT_REVIEW]:
         step = "2/5 — Винаймач"
+
     elif current in [STATE_PROPERTY_MODE, STATE_PROPERTY_PHOTOS, STATE_PROPERTY_TEXT, STATE_PROPERTY_REVIEW]:
-        step = "3/5 — Об'єкт"
+        step = "3/5 — Об'єкт" if contract_type == "rent" else "2/4 — Об'єкт"
+
     elif current == STATE_FINANCE:
-        step = "4/5 — Фінанси"
+        step = "4/5 — Фінанси" if contract_type == "rent" else "3/4 — Фінанси"
+
     elif current == STATE_DATES:
-        step = "5/5 — Дати"
+        step = "5/5 — Дати" if contract_type == "rent" else "4/4 — Дати"
+
     else:
         step = "Старт"
 
     return f"📍 Крок {step}"
-
 
 def conflict_keyboard(conflict: dict, target: str, index: int):
     buttons = []
@@ -1096,18 +1101,22 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if s["state"] == STATE_OWNER_MODE:
-        low = text.lower()
-        if low in {"фото", "документ", "документи"}:
-            s["state"] = STATE_OWNER_PHOTOS
-            await update.message.reply_text(
-                "Надішліть фото паспорта / ID та ІПН Наймодавця.\nКоли завершите — напишіть: ГОТОВО НАЙМОДАВЕЦЬ",
-                reply_markup=ReplyKeyboardRemove()
-            )
-            return
+    low = text.lower()
+
+    owner_label = "Наймодавця" if s["contract_type"] == "rent" else "Продавця"
+    owner_done = "ГОТОВО НАЙМОДАВЕЦЬ" if s["contract_type"] == "rent" else "ГОТОВО ПРОДАВЕЦЬ"
+
+    if low in {"фото", "документ", "документи"}:
+        s["state"] = STATE_OWNER_PHOTOS
+        await update.message.reply_text(
+            f"Надішліть фото паспорта / ID та ІПН {owner_label}.\nКоли завершите — напишіть: {owner_done}",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        return
         if low in {"вручну", "текст"}:
             s["state"] = STATE_OWNER_MANUAL
             await update.message.reply_text(
-                "Надішліть дані Наймодавця одним повідомленням:\n\n"
+                f"Надішліть дані {owner_label} одним повідомленням:\n\n"
                 "ПІБ: ...\nДата народження: ...\nІПН: ...\nПаспорт: ...\n"
                 "Ким виданий: ...\nЗапис: ...\nДата видачі паспорта: ...\nАдреса: ...\nТелефон: ...",
                 reply_markup=ReplyKeyboardRemove()
@@ -1117,17 +1126,23 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if s["state"] == STATE_OWNER_PHOTOS:
-        if text.upper() == "ГОТОВО НАЙМОДАВЕЦЬ":
-            await process_person_images(update, s, "owner")
-            return
-        await update.message.reply_text("Я чекаю фото або команду: ГОТОВО НАЙМОДАВЕЦЬ")
+    owner_done = "ГОТОВО НАЙМОДАВЕЦЬ" if s["contract_type"] == "rent" else "ГОТОВО ПРОДАВЕЦЬ"
+
+    if text.upper() == owner_done:
+        await process_person_images(update, s, "owner")
         return
 
-    if s["state"] == STATE_OWNER_MANUAL:
+    await update.message.reply_text(f"Я чекаю фото або команду: {owner_done}")
+    return
+
+     if s["state"] == STATE_OWNER_MANUAL:
         s["owner_data"] = parse_manual_person_fixes(text, {})
         s["state"] = STATE_OWNER_REVIEW
+
+        owner_title = "Дані Наймодавця:" if s["contract_type"] == "rent" else "Дані Продавця:"
+
         await update.message.reply_text(
-            f"{progress_text(s)}\n\n{format_person_summary('Дані Наймодавця / Продавця:', s['owner_data'])}",
+            f"{progress_text(s)}\n\n{format_person_summary(owner_title, s['owner_data'])}",
             reply_markup=review_keyboard("owner")
         )
         return
@@ -1327,12 +1342,21 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("Введіть свій правильний варіант одним повідомленням.")
         return
 
-    if data == "confirm|owner":
-        s["state"] = STATE_TENANT_MODE
-        await query.edit_message_text("Дані Наймодавця підтверджено ✅")
+       if data == "confirm|owner":
+        if s["contract_type"] == "rent":
+            s["state"] = STATE_TENANT_MODE
+            await query.edit_message_text("Дані Наймодавця підтверджено ✅")
+            await query.message.reply_text(
+                "📍 Крок 2/5 — Винаймач\n\nОберіть спосіб введення: Фото або Вручну",
+                reply_markup=input_mode_keyboard()
+            )
+            return
+
+        s["state"] = STATE_PROPERTY_MODE
+        await query.edit_message_text("Дані Продавця підтверджено ✅")
         await query.message.reply_text(
-            "📍 Крок 2/5 — Винаймач / Покупець\n\nОберіть спосіб введення: Фото або Вручну",
-            reply_markup=input_mode_keyboard()
+            "📍 Крок 2/4 — Об'єкт\n\nВведення даних: Фото або Текст",
+            reply_markup=property_mode_keyboard()
         )
         return
 
