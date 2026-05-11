@@ -1100,7 +1100,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Оберіть тип договору кнопкою.")
         return
 
-        if s["state"] == STATE_OWNER_MODE:
+    if s["state"] == STATE_OWNER_MODE:
         low = text.lower()
 
         owner_label = "Наймодавця" if s["contract_type"] == "rent" else "Продавця"
@@ -1126,7 +1126,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text("Напишіть: Фото або Вручну")
         return
-
     if s["state"] == STATE_OWNER_PHOTOS:
     owner_done = "ГОТОВО НАЙМОДАВЕЦЬ" if s["contract_type"] == "rent" else "ГОТОВО ПРОДАВЕЦЬ"
 
