@@ -1135,7 +1135,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(f"Я чекаю фото або команду: {owner_done}")
         return
-     if s["state"] == STATE_OWNER_MANUAL:
+
+    if s["state"] == STATE_OWNER_MANUAL:
         s["owner_data"] = parse_manual_person_fixes(text, {})
         s["state"] = STATE_OWNER_REVIEW
 
