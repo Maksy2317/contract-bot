@@ -1127,15 +1127,14 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Напишіть: Фото або Вручну")
         return
     if s["state"] == STATE_OWNER_PHOTOS:
-    owner_done = "ГОТОВО НАЙМОДАВЕЦЬ" if s["contract_type"] == "rent" else "ГОТОВО ПРОДАВЕЦЬ"
+        owner_done = "ГОТОВО НАЙМОДАВЕЦЬ" if s["contract_type"] == "rent" else "ГОТОВО ПРОДАВЕЦЬ"
 
-    if text.upper() == owner_done:
-        await process_person_images(update, s, "owner")
+        if text.upper() == owner_done:
+            await process_person_images(update, s, "owner")
+            return
+
+        await update.message.reply_text(f"Я чекаю фото або команду: {owner_done}")
         return
-
-    await update.message.reply_text(f"Я чекаю фото або команду: {owner_done}")
-    return
-
      if s["state"] == STATE_OWNER_MANUAL:
         s["owner_data"] = parse_manual_person_fixes(text, {})
         s["state"] = STATE_OWNER_REVIEW
