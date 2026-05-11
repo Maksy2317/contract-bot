@@ -1100,19 +1100,20 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Оберіть тип договору кнопкою.")
         return
 
-    if s["state"] == STATE_OWNER_MODE:
-    low = text.lower()
+        if s["state"] == STATE_OWNER_MODE:
+        low = text.lower()
 
-    owner_label = "Наймодавця" if s["contract_type"] == "rent" else "Продавця"
-    owner_done = "ГОТОВО НАЙМОДАВЕЦЬ" if s["contract_type"] == "rent" else "ГОТОВО ПРОДАВЕЦЬ"
+        owner_label = "Наймодавця" if s["contract_type"] == "rent" else "Продавця"
+        owner_done = "ГОТОВО НАЙМОДАВЕЦЬ" if s["contract_type"] == "rent" else "ГОТОВО ПРОДАВЕЦЬ"
 
-    if low in {"фото", "документ", "документи"}:
-        s["state"] = STATE_OWNER_PHOTOS
-        await update.message.reply_text(
-            f"Надішліть фото паспорта / ID та ІПН {owner_label}.\nКоли завершите — напишіть: {owner_done}",
-            reply_markup=ReplyKeyboardRemove()
-        )
-        return
+        if low in {"фото", "документ", "документи"}:
+            s["state"] = STATE_OWNER_PHOTOS
+            await update.message.reply_text(
+                f"Надішліть фото паспорта / ID та ІПН {owner_label}.\nКоли завершите — напишіть: {owner_done}",
+                reply_markup=ReplyKeyboardRemove()
+            )
+            return
+
         if low in {"вручну", "текст"}:
             s["state"] = STATE_OWNER_MANUAL
             await update.message.reply_text(
@@ -1122,6 +1123,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=ReplyKeyboardRemove()
             )
             return
+
         await update.message.reply_text("Напишіть: Фото або Вручну")
         return
 
