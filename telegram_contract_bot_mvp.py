@@ -1064,36 +1064,36 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     s = sessions[user_id]
     text = update.message.text.strip()
 
-    if s["state"] == STATE_WAIT_TYPE:
-    if text == "Оренда":
-        s["contract_type"] = "rent"
-        s["state"] = STATE_OWNER_MODE
-        await update.message.reply_text(
-            "📍 Крок 1/5 — Наймодавець\n\nОберіть спосіб введення: Фото або Вручну",
-            reply_markup=input_mode_keyboard()
-        )
-        return
+        if s["state"] == STATE_WAIT_TYPE:
+        if text == "Оренда":
+            s["contract_type"] = "rent"
+            s["state"] = STATE_OWNER_MODE
+            await update.message.reply_text(
+                "📍 Крок 1/5 — Наймодавець\n\nОберіть спосіб введення: Фото або Вручну",
+                reply_markup=input_mode_keyboard()
+            )
+            return
 
-    if text == "Купівля":
-        s["contract_type"] = "sale"
-        s["state"] = STATE_OWNER_MODE
-        await update.message.reply_text(
-            "📍 Крок 1/5 — Продавець\n\nОберіть спосіб введення: Фото або Вручну",
-            reply_markup=input_mode_keyboard()
-        )
-        return
+        if text == "Купівля":
+            s["contract_type"] = "sale"
+            s["state"] = STATE_OWNER_MODE
+            await update.message.reply_text(
+                "📍 Крок 1/5 — Продавець\n\nОберіть спосіб введення: Фото або Вручну",
+                reply_markup=input_mode_keyboard()
+            )
+            return
 
-    if text == "Продаж":
-        s["contract_type"] = "sale"
-        s["state"] = STATE_OWNER_MODE
-        await update.message.reply_text(
-            "📍 Крок 1/5 — Продавець\n\nОберіть спосіб введення: Фото або Вручну",
-            reply_markup=input_mode_keyboard()
-        )
-        return
+        if text == "Продаж":
+            s["contract_type"] = "sale"
+            s["state"] = STATE_OWNER_MODE
+            await update.message.reply_text(
+                "📍 Крок 1/5 — Продавець\n\nОберіть спосіб введення: Фото або Вручну",
+                reply_markup=input_mode_keyboard()
+            )
+            return
 
-    await update.message.reply_text("Оберіть тип договору кнопкою.")
-    return
+        await update.message.reply_text("Оберіть тип договору кнопкою.")
+        return
 
     if s["state"] == STATE_OWNER_MODE:
         low = text.lower()
