@@ -1343,7 +1343,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("Введіть свій правильний варіант одним повідомленням.")
         return
 
-       if data == "confirm|owner":
+    if data == "confirm|owner":
         if s["contract_type"] == "rent":
             s["state"] = STATE_TENANT_MODE
             await query.edit_message_text("Дані Наймодавця підтверджено ✅")
